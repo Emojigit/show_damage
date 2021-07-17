@@ -25,6 +25,7 @@ end)
 minetest.register_on_hp_modification(function(hp)
   local hpmod = hp - lastHP
   lastHP = hp
+  if hpmod == 0 then return end
   if not HUDID then
     return
   end
