@@ -1,6 +1,8 @@
 local HUDID = nil
+local T_HUDID
 local lastupdate = 0
 local lastHP = 0
+local TotalHPs = 0
 
 minetest.register_globalstep(function(dtime)
   if not (minetest.localplayer) then return end
@@ -11,9 +13,18 @@ minetest.register_globalstep(function(dtime)
     text          = "",
     number        = 0xFFFFFF,
     offset        = {x = -10, y = 25},
+    alignment     = {x = -10, y = 3}
+  })
+  T_HUDID = T_HUDID or minetest.localplayer:hud_add({
+    hud_elem_type = "text",
+    position      = {x = 1, y = 0},
+    scale         = {x = 100, y = 100},
+    text          = "Total: 0",
+    number        = 0xFFFFFF,
+    offset        = {x = -10, y = 25},
     alignment     = {x = -1, y = 3}
   })
-  if not HUDID then
+  if (not HUDID) or (not T_HUDID)  then
     error("Show damage mod failed on HUD element creating!")
   end
   lastupdate = lastupdate - dtime
@@ -23,6 +34,7 @@ minetest.register_globalstep(function(dtime)
 end)
 
 minetest.register_on_hp_modification(function(hp)
+  TotalHPs = hp
   local hpmod = hp - lastHP
   lastHP = hp
   if hpmod == 0 then return end
@@ -39,6 +51,7 @@ minetest.register_on_hp_modification(function(hp)
   lastupdate = 5 -- Reset after 5 seconds
   minetest.localplayer:hud_change(HUDID, "number", color)
   minetest.localplayer:hud_change(HUDID, "text", hpstr)
+  minetest.localplayer:hud_change(T_HUDID, "text", "Total: " .. tostring(TotalHPs))
 end)
 
 minetest.log("info","[Show Damage CSM] OK")
