@@ -2,7 +2,6 @@ local HUDID = nil
 local T_HUDID
 local lastupdate = 0
 local lastHP = 0
-local TotalHPs = 0
 
 minetest.register_globalstep(function(dtime)
   if not (minetest.localplayer) then return end
@@ -34,7 +33,7 @@ minetest.register_globalstep(function(dtime)
 end)
 
 minetest.register_on_hp_modification(function(hp)
-  TotalHPs = hp
+  if not (minetest.localplayer) then return end
   local hpmod = hp - lastHP
   lastHP = hp
   if hpmod == 0 then return end
@@ -51,7 +50,7 @@ minetest.register_on_hp_modification(function(hp)
   lastupdate = 5 -- Reset after 5 seconds
   minetest.localplayer:hud_change(HUDID, "number", color)
   minetest.localplayer:hud_change(HUDID, "text", hpstr)
-  minetest.localplayer:hud_change(T_HUDID, "text", "Total: " .. tostring(TotalHPs))
+  minetest.localplayer:hud_change(T_HUDID, "text", "Total: " .. tostring(minetest.localplayer:get_hp()))
 end)
 
 minetest.log("info","[Show Damage CSM] OK")
